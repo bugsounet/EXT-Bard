@@ -27,6 +27,12 @@ module.exports = NodeHelper.create({
         if (!this.conversation) return
         this.BardQuery(payload)
         break
+      case "TB_QUERY":
+        if (!this.conversation) return
+        let query = payload.Query
+        let telegramBot = payload.TBkey
+        this.BardQuery(query, telegramBot)
+        break
     }
   },
 
@@ -45,16 +51,17 @@ module.exports = NodeHelper.create({
     }
   },
 
-  BardQuery: async function(query) {
+  BardQuery: async function(query, Telegram) {
     log("[Query]", query)
     this.sendSocketNotification("THINK", query)
     let result = await this.conversation.ask(query)
     log("[Result]", result)
-    this.createHTML(result)
     if (!this.Ids) {
       let exportIds = await this.conversation.export()
       this.saveIds(exportIds)
     }
+    if (Telegram) return this.sendSocketNotification("TB_RESULT", { Result: result, TBKey: Telegram }) 
+    this.createHTML(result)
   },
 
   loadBard: async function () {

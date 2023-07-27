@@ -17,6 +17,7 @@ Module.register("EXT-Bard", {
 
   start: function () {
     this.ready = false
+    this.session = {}
   },
 
   getDom: function() {
@@ -72,6 +73,9 @@ Module.register("EXT-Bard", {
           message: "[BARD] " + payload,
           type: "error"
         })
+        break
+      case "TB_RESULT":
+        this.tbResult(payload)
         break
     }
   },
@@ -147,4 +151,38 @@ Module.register("EXT-Bard", {
   getStyles: function () {
     return [ "EXT-Bard.css" ]
   },
+
+  /********************************/
+  /*** EXT-TelegramBot Commands ***/
+  /********************************/
+  EXT_TELBOTCommands: function(commander) {
+    commander.add({
+      command: "bard",
+      description: "Make a conversation with Google Bard",
+      callback: "tbBard"
+    })
+  },
+
+  tbBard: function(command, handler) {
+    if (!this.ready) return handler.reply("TEXT", "Not available actually.")
+    let key = Date.now()
+    this.session[key] = handler
+    if (handler.args) {
+      handler.reply("TEXT", "Query Bard for " + handler.args + "...")
+      this.sendSocketNotification("TB_QUERY", {TBkey:key, Query: handler.args})
+    } else {
+      handler.reply("TEXT", "Ask your Query for Google Bard")
+    }
+  },
+
+  tbResult: function(result) {
+    if (result.TBKey && result.Result && this.session[result.TBKey]) {
+      var handler = this.session[result.TBKey]
+      handler.reply("TEXT", TelegramBotExtraChars(result.Result), {parse_mode:"Markdown"})
+      this.session[result.TBKey] = null
+      delete this.session[result.TBKey]
+    } else {
+      this.sendNotification("EXT_TELBOT-TELL_ADMIN", "Bard data received error")
+    }
+  }
 })
