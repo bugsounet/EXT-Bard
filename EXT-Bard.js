@@ -8,7 +8,11 @@
 Module.register("EXT-Bard", {
   defaults: {
     debug: false,
-    COOKIE_KEY: null
+    COOKIE_KEY: null,
+    scrollActivate: true,
+    scrollStep: 25,
+    scrollInterval: 1000,
+    scrollStart: 10000
   },
 
   start: function () {
@@ -103,6 +107,38 @@ Module.register("EXT-Bard", {
           Webview.id = "EXT_BARD-Webview"
           Webview.scrolling="no"
           Webview.src= "modules/EXT-Bard/tmp/output/tmp.html?seed="+Date.now()
+          Webview.addEventListener("did-stop-loading", (event) => {
+            event.stopPropagation()
+            if (Webview.getURL() == "about:blank") return
+            Webview.executeJavaScript(`
+            var timer = null
+            var timerScroll = null
+            function scrollDown(posY){
+              clearTimeout(timer)
+              timer = null
+              var scrollHeight = document.body.scrollHeight
+              if (posY == 0) console.log("Begin Scrolling")
+              if (posY > scrollHeight) posY = scrollHeight
+              document.documentElement.scrollTop = document.body.scrollTop = posY;
+              if (posY == scrollHeight) {
+                clearTimeout(timer)
+                timer = null
+                clearTimeout(timerScroll)
+                timerScroll = null
+                console.log("End Scrolling")
+                return
+              }
+              timer = setTimeout(function(){
+                if (posY < scrollHeight) {
+                  posY = posY + ${this.config.scrollStep}
+                  scrollDown(posY);
+                }
+              }, ${this.config.scrollInterval});
+            };
+            if (${this.config.scrollActivate}) {
+              timerScroll = setTimeout(() => scrollDown(0), ${this.config.scrollStart});
+            };`)
+          })
           Box.appendChild(Webview)
 
     document.body.appendChild(Bard)
