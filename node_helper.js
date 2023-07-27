@@ -53,7 +53,7 @@ module.exports = NodeHelper.create({
 
   BardQuery: async function(query, Telegram) {
     log("[Query]", query)
-    this.sendSocketNotification("THINK", query)
+    if (!Telegram) this.sendSocketNotification("THINK", query)
     let result = await this.conversation.ask(query)
     log("[Result]", result)
     if (!this.Ids) {
