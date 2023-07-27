@@ -7,8 +7,12 @@
 
 Module.register("EXT-Bard", {
   defaults: {
-    debug: true,
+    debug: false,
     COOKIE_KEY: null
+  },
+
+  start: function () {
+    this.ready = false
   },
 
   getDom: function() {
@@ -26,10 +30,8 @@ Module.register("EXT-Bard", {
           this.sendSocketNotification("INIT", this.config)
         }
         break
-      case "EXT_BARD-RESET":
-        this.sendSocketNotification("RESET")
-        break
       case "EXT_BARD-SHOW":
+        if (!this.ready) return
         var bard = document.getElementById("EXT_BARD")
         bard.classList.remove("hidden")
         break
@@ -39,13 +41,16 @@ Module.register("EXT-Bard", {
         bard.classList.add("hidden")
         break
       case "EXT_BARD-QUERY":
-        if (payload) this.sendSocketNotification("QUERY", payload)
+        if (payload && this.ready) this.sendSocketNotification("QUERY", payload)
         break
     }
   },
 
   socketNotificationReceived: function(noti, payload) {
     switch(noti) {
+      case "INITIALIZED":
+        this.ready = true
+        break
       case "REPLY":
         var replyStatus = document.getElementById("EXT_BARD-Status")
         replyStatus.src = "modules/EXT-Bard/resources/standby.gif"
@@ -57,6 +62,13 @@ Module.register("EXT-Bard", {
         thinkStatus.src = "modules/EXT-Bard/resources/think.gif"
         var Text = document.getElementById("EXT_BARD-Text")
         Text.textContent = payload
+        break
+      case "ERROR":
+        this.sendNotification("EXT_ALERT", {
+          message: "[BARD] " + payload,
+          type: "error"
+        })
+        break
     }
   },
 

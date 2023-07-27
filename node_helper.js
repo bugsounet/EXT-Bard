@@ -37,8 +37,11 @@ module.exports = NodeHelper.create({
       this.Ids = this.loadIds()
       if (this.Ids) this.conversation = new this.Bard.Chat(this.Ids)
       else this.conversation = new this.Bard.Chat()
+      this.sendSocketNotification("INITIALIZED")
+      console.log("[BARD] Initialized!")
     } catch (e) {
-      console.error("[BARD]", e)
+      console.error("[BARD]", e.message)
+      this.sendSocketNotification("Error", e.message)
     }
   },
 
@@ -62,10 +65,10 @@ module.exports = NodeHelper.create({
   createHTML: function(result) {
     try {
       fs.writeFileSync(this.tmpPath+ "/input/tmp.md", result)
-      log("MD file saved!")
-    } catch (err) {
-      console.error("[BARD]", err.message)
-      this.sendSocketNotification("ERROR", err.message)
+      log("[MD] MD file saved!")
+    } catch (e) {
+      console.error("[BARD] [MD]", e.message)
+      this.sendSocketNotification("ERROR", e.message)
       return
     }
 
@@ -77,11 +80,11 @@ module.exports = NodeHelper.create({
         layout: this.tmpPath + '/layout'
       }), () => {
         this.sendSocketNotification("REPLY", result)
-        log("HTML File Created!")
+        log("[HTML] File Created!")
       })
-    } catch (err) {
-      console.error("[BARD]", err.message)
-      this.sendSocketNotification("ERROR", err.message)
+    } catch (e) {
+      console.error("[BARD] [HTML]", e.message)
+      this.sendSocketNotification("ERROR", e.message)
     }
   },
 
@@ -91,10 +94,13 @@ module.exports = NodeHelper.create({
      try {
        let Ids = fs.readFileSync(this.tmpPath + "/Chat/Ids.json")
        result = JSON.parse(Ids)
-       console.log("[BARD] Continue last Conversation")
+       console.log("[BARD] [Ids] Continue last Conversation")
      } catch (e) {
-       if (e.code == "ENOENT") console.log("[BARD] Create new Conversation")
-       else console.error("[BARD]", e.message)
+       if (e.code == "ENOENT") console.log("[BARD] [Ids] Create new Conversation")
+       else {
+         console.error("[BARD] [Ids] ", e.message)
+         this.sendSocketNotification("Error", e.message)
+       }
      }
      return result
   },
@@ -104,9 +110,10 @@ module.exports = NodeHelper.create({
        let result = JSON.stringify(Ids)
        fs.writeFileSync(this.tmpPath + "/Chat/Ids.json", result)
        this.Ids = Ids
-       log("[BARD] Conversation Ids Saved")
+       log("[BARD] [Ids] Conversation Ids Saved")
     } catch (e) {
-      console.error("[BARD]", e.message)
+      console.error("[BARD] [Ids]", e.message)
+      this.sendSocketNotification("Error", e.message)
       this.Ids = null
     }
   }
