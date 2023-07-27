@@ -1,0 +1,65 @@
+#EXT_BARD {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  background-color: black;
+}
+
+#EXT_BARD-Container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+}
+
+#EXT_BARD-TopBar {
+  height: 100px;
+  width: 100%;
+  background-color: black;
+  display: flex;
+  align-items: center;
+}
+
+#EXT_BARD-Status {
+  height: 64px;
+  width: 64px;
+}
+
+#EXT_BARD-Text {
+  flex: 1 auto;
+  color: white;
+  margin: 10px;
+}
+
+#EXT_BARD-Content {
+  display: flex;
+  align-items: center;
+  background-color: #303030;
+  border-radius: 24px;
+  width: 95%;
+  height: 85%;
+  padding: 24px;
+}
+
+#EXT_BARD-Box {
+  height: 95%;
+  width: 95%;
+  border-radius: 12px;
+  background: black;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1em;
+}
+
+#EXT_BARD-Webview {
+  width: 100%;
+  height: 100%;
+}
+
+#EXT_BARD.hidden {
+  display:none;
+}

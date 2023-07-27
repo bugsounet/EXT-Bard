@@ -1,0 +1,24 @@
+{
+  "name": "EXT-Bard",
+  "version": "1.0.0",
+  "rev": "230723",
+  "description": "Test plugin",
+  "main": "EXT-Bard.js",
+  "scripts": {
+    "preinstall": "installer/preinstall.sh",
+    "postinstall": "installer/postinstall.sh -b",
+    "update": "installer/update.sh",
+    "reset": "git reset --hard",
+    "clean": "rm -rf node_modules package-lock.json"
+  },
+  "author": "bugsounet",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bugsounet/EXT-Bard"
+  },
+  "dependencies": {
+    "bard-ai": "^1.5.4",
+    "markdown-styles": "^3.2.0"
+  }
+}
