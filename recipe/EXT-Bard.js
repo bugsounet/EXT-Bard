@@ -5,7 +5,7 @@
 var recipe = {
   transcriptionHooks: {
     "EXT_Bard": {
-      pattern: "bard",
+      pattern: "^(bard)($)",
       command: "EXT_Bard"
     }
   },
