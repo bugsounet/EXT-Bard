@@ -1,8 +1,8 @@
 {
   "name": "EXT-Bard",
   "version": "1.0.0",
-  "rev": "230723",
-  "description": "Test plugin",
+  "rev": "230730",
+  "description": "Google Bard AI",
   "main": "EXT-Bard.js",
   "scripts": {
     "preinstall": "installer/preinstall.sh",
