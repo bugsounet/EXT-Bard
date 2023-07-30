@@ -32,20 +32,18 @@ Module.register("EXT-Bard", {
       case "GW_READY":
         if (sender.name == "Gateway") {
           this.preparePopup()
-          this.sendNotification("HELLO", this.name)
+          this.sendNotification("EXT_HELLO", this.name)
           this.sendSocketNotification("INIT", this.config)
         }
         break
       case "EXT_BARD-SHOW":
         if (!this.ready || this.shown) return
         this.bardShow()
-        this.shown = true
         break
       case "EXT_STOP":
       case "EXT_BARD-HIDE":
         if (!this.shown) return
         this.bardHide()
-        this.shown = false
         break
       case "EXT_BARD-QUERY":
         if (payload && this.ready && this.shown) this.sendSocketNotification("QUERY", payload)
@@ -166,6 +164,8 @@ Module.register("EXT-Bard", {
     bard.style.animationFillMode = "inherit"
     bard.classList.add("animate__backInLeft")
     bard.style.display= "block"
+    this.shown = true
+    this.sendNotification("EXT_BARD-CONNECTED")
   },
 
   bardHide() {
@@ -179,6 +179,8 @@ Module.register("EXT-Bard", {
           module.show(200, () => {}, {lockString: "EXT-BARD_LOCKED"})
         })
         bard.classList.add("hidden")
+        this.shown = false
+        this.sendNotification("EXT_BARD-DISCONNECTED")
       }
       e.stopPropagation()
     }, {once: true})
