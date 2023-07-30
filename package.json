@@ -6,7 +6,7 @@
   "main": "EXT-Bard.js",
   "scripts": {
     "preinstall": "installer/preinstall.sh",
-    "postinstall": "installer/postinstall.sh -b",
+    "postinstall": "installer/postinstall.sh -m -b",
     "update": "installer/update.sh",
     "reset": "git reset --hard",
     "clean": "rm -rf node_modules package-lock.json"
@@ -19,6 +19,8 @@
   },
   "dependencies": {
     "bard-ai": "^1.5.4",
+    "esbuild": "^0.18.17",
+    "glob": "^10.3.3",
     "markdown-styles": "^3.2.0"
   }
 }
