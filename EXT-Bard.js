@@ -18,6 +18,7 @@ Module.register("EXT-Bard", {
   start: function () {
     this.ready = false
     this.session = {}
+    this.shown = false
   },
 
   getDom: function() {
@@ -31,22 +32,21 @@ Module.register("EXT-Bard", {
       case "GW_READY":
         if (sender.name == "Gateway") {
           this.preparePopup()
-          this.sendNotification("HELLO", this.name)
+          this.sendNotification("EXT_HELLO", this.name)
           this.sendSocketNotification("INIT", this.config)
         }
         break
       case "EXT_BARD-SHOW":
-        if (!this.ready) return
-        var bard = document.getElementById("EXT_BARD")
-        bard.classList.remove("hidden")
+        if (!this.ready || this.shown) return
+        this.bardShow()
         break
       case "EXT_STOP":
       case "EXT_BARD-HIDE":
-        var bard = document.getElementById("EXT_BARD")
-        bard.classList.add("hidden")
+        if (!this.shown) return
+        this.bardHide()
         break
       case "EXT_BARD-QUERY":
-        if (payload && this.ready) this.sendSocketNotification("QUERY", payload)
+        if (payload && this.ready && this.shown) this.sendSocketNotification("QUERY", payload)
         break
     }
   },
@@ -83,8 +83,10 @@ Module.register("EXT-Bard", {
   preparePopup() {
     var Bard = document.createElement("div")
     Bard.id = "EXT_BARD"
+    Bard.className= "animate__animated"
+    Bard.style.setProperty('--animate-duration', '1s')
     Bard.classList.add("hidden")
-    
+
       var Container = document.createElement("div")
       Container.id = "EXT_BARD-Container"
       Bard.appendChild(Container)
@@ -150,6 +152,38 @@ Module.register("EXT-Bard", {
 
   getStyles: function () {
     return [ "EXT-Bard.css" ]
+  },
+
+  bardShow() {
+    var bard = document.getElementById("EXT_BARD")
+    MM.getModules().enumerate((module) => {
+      module.hide(200, () => {}, {lockString: "EXT-BARD_LOCKED"})
+    })
+    bard.classList.remove("hidden")
+    bard.classList.remove("animate__backOutRight")
+    bard.style.animationFillMode = "inherit"
+    bard.classList.add("animate__backInLeft")
+    bard.style.display= "block"
+    this.shown = true
+    this.sendNotification("EXT_BARD-CONNECTED")
+  },
+
+  bardHide() {
+    var bard = document.getElementById("EXT_BARD")
+    bard.classList.remove("animate__backInLeft")
+    bard.style.animationFillMode = "both"
+    bard.classList.add("animate__backOutRight")
+    bard.addEventListener('animationend', (e) => {
+      if (e.animationName == "backOutRight") {
+        MM.getModules().enumerate((module)=> {
+          module.show(200, () => {}, {lockString: "EXT-BARD_LOCKED"})
+        })
+        bard.classList.add("hidden")
+        this.shown = false
+        this.sendNotification("EXT_BARD-DISCONNECTED")
+      }
+      e.stopPropagation()
+    }, {once: true})
   },
 
   /********************************/
