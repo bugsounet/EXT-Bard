@@ -1,7 +1,7 @@
 {
   "name": "EXT-Bard",
-  "version": "1.0.0",
-  "rev": "230730",
+  "version": "1.1.0",
+  "rev": "230825",
   "description": "Google Bard AI",
   "main": "EXT-Bard.js",
   "scripts": {
@@ -18,8 +18,8 @@
     "url": "https://github.com/bugsounet/EXT-Bard"
   },
   "dependencies": {
-    "bard-ai": "^1.5.4",
-    "esbuild": "^0.18.17",
+    "bard-ai": "^2.0.3",
+    "esbuild": "^0.19.2",
     "glob": "^10.3.3",
     "markdown-styles": "^3.2.0"
   }

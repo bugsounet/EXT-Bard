@@ -11,6 +11,7 @@ module.exports = NodeHelper.create({
     this.config = null
     this.tmpPath = path.resolve(__dirname, 'tmp')
     this.Bard = null
+    this.myBard= null
     this.Conversation = null
     this.Ids = null
   },
@@ -39,15 +40,15 @@ module.exports = NodeHelper.create({
   initialize: async function() {
     this.Bard = await this.loadBard()
     try {
-      await this.Bard.init(this.config.COOKIE_KEY)
+      this.myBard = await new this.Bard(this.config.COOKIE_KEY, {verbose: this.config.debug})
       this.Ids = this.loadIds()
-      if (this.Ids) this.conversation = new this.Bard.Chat(this.Ids)
-      else this.conversation = new this.Bard.Chat()
+      if (this.Ids) this.conversation = this.myBard.createChat(this.Ids)
+      else this.conversation = this.myBard.createChat()
       this.sendSocketNotification("INITIALIZED")
       console.log("[BARD] Initialized!")
     } catch (e) {
       console.error("[BARD]", e.message)
-      this.sendSocketNotification("Error", e.message)
+      this.sendSocketNotification("ERROR", e.message)
     }
   },
 
@@ -106,7 +107,7 @@ module.exports = NodeHelper.create({
        if (e.code == "ENOENT") console.log("[BARD] [Ids] Create new Conversation")
        else {
          console.error("[BARD] [Ids] ", e.message)
-         this.sendSocketNotification("Error", e.message)
+         this.sendSocketNotification("ERROR", e.message)
        }
      }
      return result
@@ -120,7 +121,7 @@ module.exports = NodeHelper.create({
        log("[BARD] [Ids] Conversation Ids Saved")
     } catch (e) {
       console.error("[BARD] [Ids]", e.message)
-      this.sendSocketNotification("Error", e.message)
+      this.sendSocketNotification("ERROR", e.message)
       this.Ids = null
     }
   }
